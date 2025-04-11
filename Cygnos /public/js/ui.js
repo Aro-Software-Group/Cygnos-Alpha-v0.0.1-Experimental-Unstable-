@@ -418,7 +418,70 @@ class UiManager {
         }
     }
     
-    // ... 既存の processUserRequest, processNextStep メソッド ...
+    /**
+     * Process user request and generate plan
+     * @param {string} message - User message
+     * @param {string} processingMessageId - Processing message ID
+     * @param {Array} fileContents - Array of file contents
+     */
+    async processUserRequest(message, processingMessageId, fileContents) {
+        try {
+            // Generate plan
+            const steps = await processorSystem.generatePlan(message);
+            
+            // Remove processing message
+            this.removeMessage(processingMessageId);
+            
+            // Add plan steps to UI
+            steps.forEach((step, index) => {
+                this.addMessage(`ステップ ${index + 1}: ${step.title}\n${step.description}`, 'assistant');
+            });
+            
+            // Execute first step
+            await this.processNextStep();
+        } catch (error) {
+            console.error('計画生成エラー:', error);
+            this.addMessage(`${CYGNOS_CONFIG.systemMessages.errorMessage} (${error.message})`, 'system');
+            
+            memorySystem.addMessage({
+                role: 'assistant',
+                content: `${CYGNOS_CONFIG.systemMessages.errorMessage} (${error.message})`
+            });
+        }
+    }
+    
+    /**
+     * Process next step in the plan
+     */
+    async processNextStep() {
+        try {
+            const result = await processorSystem.executeNextStep();
+            
+            // Add step result to UI
+            this.addMessage(result.result, 'assistant');
+            
+            // Add result to memory
+            memorySystem.addMessage({
+                role: 'assistant',
+                content: result.result
+            });
+            
+            // Continue to next step if available
+            if (result.status === 'paused') {
+                this.addMessage('次のステップを実行するには「次へ」と入力してください。', 'system');
+            } else if (result.status === 'completed') {
+                this.addMessage('タスクが完了しました。', 'system');
+            }
+        } catch (error) {
+            console.error('ステップ実行エラー:', error);
+            this.addMessage(`${CYGNOS_CONFIG.systemMessages.errorMessage} (${error.message})`, 'system');
+            
+            memorySystem.addMessage({
+                role: 'assistant',
+                content: `${CYGNOS_CONFIG.systemMessages.errorMessage} (${error.message})`
+            });
+        }
+    }
     
     /**
      * Add a message to the chat UI
@@ -626,7 +689,129 @@ class UiManager {
         }
     }
 
-    // ... 既存の openFileSelector, handleFileSelection, showFilePreview, getFileIconClass, formatFileSize, confirmFileUpload, readFileContent メソッド ...
+    /**
+     * Open file selector
+     */
+    openFileSelector() {
+        if (this.fileInput) {
+            this.fileInput.click();
+        }
+    }
+    
+    /**
+     * Handle file selection
+     * @param {Event} event - File input change event
+     */
+    handleFileSelection(event) {
+        const files = event.target.files;
+        if (files.length > 0) {
+            this.selectedFiles = Array.from(files);
+            this.showFilePreview();
+        }
+    }
+    
+    /**
+     * Show file preview modal
+     */
+    showFilePreview() {
+        if (!this.filePreviewContainer) return;
+        
+        this.filePreviewContainer.innerHTML = '';
+        
+        this.selectedFiles.forEach(file => {
+            const fileElement = document.createElement('div');
+            fileElement.className = 'file-preview-item';
+            
+            const fileIcon = document.createElement('i');
+            fileIcon.className = this.getFileIconClass(file.type);
+            
+            const fileName = document.createElement('span');
+            fileName.className = 'file-name';
+            fileName.textContent = file.name;
+            
+            const fileSize = document.createElement('span');
+            fileSize.className = 'file-size';
+            fileSize.textContent = this.formatFileSize(file.size);
+            
+            fileElement.appendChild(fileIcon);
+            fileElement.appendChild(fileName);
+            fileElement.appendChild(fileSize);
+            
+            this.filePreviewContainer.appendChild(fileElement);
+        });
+        
+        this.openModal(this.filePreviewModal);
+    }
+    
+    /**
+     * Get file icon class based on file type
+     * @param {string} fileType - File MIME type
+     * @returns {string} - Icon class
+     */
+    getFileIconClass(fileType) {
+        if (fileType.startsWith('image/')) {
+            return 'fas fa-file-image';
+        } else if (fileType.startsWith('video/')) {
+            return 'fas fa-file-video';
+        } else if (fileType.startsWith('audio/')) {
+            return 'fas fa-file-audio';
+        } else if (fileType === 'application/pdf') {
+            return 'fas fa-file-pdf';
+        } else if (fileType === 'application/msword' || fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            return 'fas fa-file-word';
+        } else if (fileType === 'application/vnd.ms-excel' || fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+            return 'fas fa-file-excel';
+        } else if (fileType === 'application/vnd.ms-powerpoint' || fileType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+            return 'fas fa-file-powerpoint';
+        } else if (fileType.startsWith('text/')) {
+            return 'fas fa-file-alt';
+        } else {
+            return 'fas fa-file';
+        }
+    }
+    
+    /**
+     * Format file size to human-readable string
+     * @param {number} size - File size in bytes
+     * @returns {string} - Formatted file size
+     */
+    formatFileSize(size) {
+        if (size < 1024) {
+            return `${size} B`;
+        } else if (size < 1024 * 1024) {
+            return `${(size / 1024).toFixed(1)} KB`;
+        } else if (size < 1024 * 1024 * 1024) {
+            return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+        } else {
+            return `${(size / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+        }
+    }
+    
+    /**
+     * Confirm file upload and close preview modal
+     */
+    confirmFileUpload() {
+        this.closeModal(this.filePreviewModal);
+        
+        // Add file names to chat
+        this.selectedFiles.forEach(file => {
+            this.addMessage(`ファイルをアップロードしました: ${file.name}`, 'user');
+        });
+    }
+    
+    /**
+     * Read file content as text
+     * @param {File} file - File object
+     * @returns {Promise<string>} - File content
+     */
+    readFileContent(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsText(file);
+        });
+    }
     
     /**
      * Resize textarea based on content
@@ -660,7 +845,49 @@ class UiManager {
         }
     }
     
-    // ... 既存の startVoiceInput, stopVoiceInput メソッド ...
+    /**
+     * Start voice input
+     */
+    startVoiceInput() {
+        if (!('webkitSpeechRecognition' in window)) return;
+        
+        this.recognition = new webkitSpeechRecognition();
+        this.recognition.lang = 'ja-JP';
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+        
+        this.recognition.onstart = () => {
+            this.isListening = true;
+            this.voiceInputButton.classList.add('listening');
+        };
+        
+        this.recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            this.userInput.value = transcript;
+            this.resizeTextarea();
+        };
+        
+        this.recognition.onerror = (event) => {
+            console.error('音声入力エラー:', event.error);
+            this.showNotification('音声入力中にエラーが発生しました', 'error');
+        };
+        
+        this.recognition.onend = () => {
+            this.isListening = false;
+            this.voiceInputButton.classList.remove('listening');
+        };
+        
+        this.recognition.start();
+    }
+    
+    /**
+     * Stop voice input
+     */
+    stopVoiceInput() {
+        if (this.recognition) {
+            this.recognition.stop();
+        }
+    }
     
     /**
      * Toggle processing panel visibility

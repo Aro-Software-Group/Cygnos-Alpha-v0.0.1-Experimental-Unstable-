@@ -418,7 +418,7 @@ select {
     width: 8px;
     height: 8px;
     background-color: var(--success-color);
-    border-radius: var(--radius-rounded);
+    border-radius: var (--radius-rounded);
     margin-right: 0.5rem;
 }
 
@@ -995,7 +995,7 @@ select {
     display: inline-block;
     margin-top: 0.5rem;
     font-size: 0.85rem;
-    color: var(--primary-color);
+    color: var (--primary-color);
     text-decoration: none;
     transition: var(--transition-fast);
 }

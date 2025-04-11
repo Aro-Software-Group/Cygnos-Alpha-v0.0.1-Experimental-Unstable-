@@ -192,4 +192,4 @@ class ThemeManager {
 // Initialize the theme manager when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.themeManager = new ThemeManager();
-}); 
+});
