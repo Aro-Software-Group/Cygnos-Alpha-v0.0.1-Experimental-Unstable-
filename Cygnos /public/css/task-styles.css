@@ -1,0 +1,232 @@
+/* Task Management Styles */
+
+#task-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--chat-bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.task-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.task-header .controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#task-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+}
+
+/* この部分は style.css に統合しました */
+/* タスク項目、空のステート、モーダルなど */
+
+/* タスクリスト内の特別なスタイリング */
+.task-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-rounded);
+  margin-left: 0.5rem;
+}
+
+.task-badge.in-progress {
+  background-color: rgba(66, 153, 225, 0.1);
+  color: var(--info-color);
+}
+
+.task-badge.scheduled {
+  background-color: rgba(237, 137, 54, 0.1);
+  color: var(--warning-color);
+}
+
+.task-badge.recurring {
+  background-color: rgba(159, 122, 234, 0.1);
+  color: #9f7aea;
+}
+
+/* タスク結果表示 */
+.task-result {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: rgba(74, 111, 165, 0.05);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border-left: 3px solid var(--info-color);
+}
+
+.task-result pre {
+  margin: var(--spacing-sm) 0;
+  padding: var(--spacing-sm);
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-family: var(--font-code);
+  font-size: 0.9rem;
+}
+
+[data-theme="dark"] .task-result pre {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* カンバンビュー（将来的な拡張のため） */
+.kanban-view {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding: var(--spacing-md);
+}
+
+.kanban-column {
+  min-width: 280px;
+  width: 280px;
+  background-color: var(--card-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.kanban-column-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kanban-column-content {
+  padding: var(--spacing-md);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.kanban-card {
+  background-color: var(--background-color);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.kanban-card:hover {
+  box-shadow: var(--card-hover-shadow);
+  transform: translateY(-2px);
+}
+
+.kanban-card-title {
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.kanban-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-top: var(--spacing-xs);
+}
+
+/* フィルターとソート */
+.task-filters {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--card-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+}
+
+.filter-group label {
+  margin-right: var(--spacing-xs);
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.filter-group select {
+  padding: 0.3rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.search-tasks {
+  flex: 1;
+  position: relative;
+}
+
+.search-tasks input {
+  width: 100%;
+  padding: 0.3rem 0.5rem 0.3rem 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.search-tasks i {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+}
+
+/* メディアクエリ - モバイル対応 */
+@media (max-width: 768px) {
+  .task-filters {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .search-tasks {
+    order: -1;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .kanban-view {
+    flex-direction: column;
+  }
+  
+  .kanban-column {
+    width: 100%;
+    min-width: 100%;
+    margin-bottom: var(--spacing-md);
+  }
+}
