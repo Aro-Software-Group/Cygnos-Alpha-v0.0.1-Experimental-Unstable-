@@ -1059,7 +1059,7 @@ class UiManager {
             '<': '&lt;',
             '>': '&gt;',
             '"': '&quot;',
-            "'": '&#039;'
+            "'": '&#039;
         };
         return text.replace(/[&<>"']/g, char => map[char]);
     }
