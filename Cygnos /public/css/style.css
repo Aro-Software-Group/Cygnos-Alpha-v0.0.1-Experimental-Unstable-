@@ -417,7 +417,7 @@ select {
     display: inline-block;
     width: 8px;
     height: 8px;
-    background-color: var(--success-color);
+    background-color: var (--success-color);
     border-radius: var (--radius-rounded);
     margin-right: 0.5rem;
 }
@@ -1639,7 +1639,7 @@ select {
     padding: var(--spacing-md) var(--spacing-lg);
     margin-bottom: var(--spacing-md);
     background-color: var(--card-bg);
-    border-radius: var(--radius-md);
+    border-radius: var (--radius-md);
     border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
     cursor: pointer;

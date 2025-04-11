@@ -38,6 +38,11 @@ const CYGNOS_CONFIG = {
         maxMessagesInContext: 20,
         maxStoredConversations: 50,
         maxMemoryItems: 100,
+        memoryManagement: {
+            autoCleanup: true,
+            cleanupThreshold: 80,
+            cleanupFrequency: 24 * 60 * 60 * 1000 // 24 hours
+        }
     },
 
     // Agent Capabilities
@@ -72,6 +77,12 @@ const CYGNOS_CONFIG = {
                 name: 'ファイル分析',
                 description: 'アップロードされたファイルの内容を分析します',
                 enabled: true
+            },
+            {
+                id: 'voice_input',
+                name: '音声入力',
+                description: '音声入力を使用して指示を与えます',
+                enabled: true
             }
         ]
     },
@@ -82,7 +93,12 @@ const CYGNOS_CONFIG = {
         codeHighlighting: true,
         markdownRendering: true,
         showProcessingSteps: true,
-        textToSpeech: false
+        textToSpeech: false,
+        uiEnhancements: {
+            smoothScrolling: true,
+            enhancedAnimations: true,
+            darkModeContrast: 1.2
+        }
     },
 
     // System Messages
@@ -90,6 +106,7 @@ const CYGNOS_CONFIG = {
         welcomeMessage: 'Cygnos AIエージェントへようこそ。どのようにお手伝いできますか？',
         errorMessage: 'エラーが発生しました。もう一度お試しください。',
         processingMessage: '考えています...',
+        clarificationMessage: 'もう少し具体的に教えてください。'
     },
 
     // Default User Settings
@@ -99,6 +116,10 @@ const CYGNOS_CONFIG = {
         allowWebSearch: true,
         allowCodeExecution: true,
         allowFileAccess: false,
+        userExperience: {
+            enableHints: true,
+            showTooltips: true
+        }
     },
 
     // Storage Keys
