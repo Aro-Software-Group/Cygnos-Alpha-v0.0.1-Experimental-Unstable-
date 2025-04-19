@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cygnos AI Chat</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Cygnos</h1>
+            </div>
+            <div class="sidebar-actions">
+                <button type="button" class="new-chat-btn">
+                    <i class="fas fa-plus"></i> 新規チャット
+                </button>
+                <button type="button" id="conversation-actions-btn" class="conversation-actions-btn">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            <div class="chat-history">
+                <!-- チャット履歴がここに表示されます -->
+            </div>
+            <div class="model-selector">
+                <label for="model-select">モデルを選択:</label>
+                <select id="model-select">
+                    <!-- モデルがスクリプトから動的に入力されます -->
+                </select>
+            </div>
+            <div class="settings-btn-container">
+                <button type="button" id="settings-btn" class="settings-btn">
+                    <i class="fas fa-cog"></i> 設定
+                </button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="chat-area">
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="welcome-logo">
+                        <i class="fas fa-dove"></i>
+                    </div>
+                    <h2>Cygnosへようこそ</h2>
+                    <p>AIパワードチャットアシスタント</p>
+                    <div class="suggestions">
+                        <div class="suggestion-card">
+                            <h3>ウェブ開発について教えて</h3>
+                        </div>
+                        <div class="suggestion-card">
+                            <h3>日本の歴史に関する事実を教えて</h3>
+                        </div>
+                        <div class="suggestion-card">
+                            <h3>オリジナルの物語を作って</h3>
+                        </div>
+                        <div class="suggestion-card">
+                            <h3>プログラミングの問題を解決して</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="messages" id="messages">
+                    <!-- メッセージがここに表示されます -->
+                </div>
+            </div>
+            <div class="input-area">
+                <textarea id="user-input" placeholder="メッセージを入力..."></textarea>
+                <button type="button" id="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定モーダル -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> 設定</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3>API設定</h3>
+                    <div class="tab-container">
+                        <div class="tab-header">
+                            <div class="tab active" data-tab="gemini-tab">Gemini API</div>
+                            <div class="tab" data-tab="requesty-tab">Requesty API</div>
+                        </div>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="gemini-tab">
+                                <div class="setting-item">
+                                    <label for="gemini-api-key-input">Gemini APIキー</label>
+                                    <div class="api-key-container">
+                                        <input type="password" id="gemini-api-key-input" placeholder="Gemini APIキーを入力...">
+                                        <button type="button" id="toggle-gemini-api-key" class="toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <button type="button" id="save-gemini-api-key" class="save-btn">保存</button>
+                                    <p class="setting-description">
+                                        <a href="https://ai.google.dev/" target="_blank">Google AI Studio</a>からAPIキーを取得できます。
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="requesty-tab">
+                                <div class="setting-item">
+                                    <label for="requesty-api-key-input">Requesty APIキー</label>
+                                    <div class="api-key-container">
+                                        <input type="password" id="requesty-api-key-input" placeholder="Requesty APIキーを入力...">
+                                        <button type="button" id="toggle-requesty-api-key" class="toggle-password">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <button type="button" id="save-requesty-api-key" class="save-btn">保存</button>
+                                    <p class="setting-description">
+                                        <a href="https://requesty.ai" target="_blank">Requesty.ai</a>からAPIキーを取得できます。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>テーマ設定</h3>
+                    <div class="setting-item">
+                        <label for="theme-select">テーマを選択</label>
+                        <select id="theme-select">
+                            <option value="light" selected>ライト</option>
+                            <option value="dark">ダーク</option>
+                            <option value="system">システム設定に合わせる</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>応答生成設定</h3>
+                    <div class="setting-item">
+                        <label for="temperature-input">Temperature</label>
+                        <div class="range-container">
+                            <input type="range" id="temperature-input" min="0" max="1" step="0.1" value="0.7">
+                            <span id="temperature-value">0.7</span>
+                        </div>
+                        <p class="setting-description">値が高いほど、より創造的で多様な応答になります。低いと一貫性が高まります。</p>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>使用可能モデル</h3>
+                    <div class="models-info">
+                        <h4>Gemini:</h4>
+                        <p>gemini-2.5-flash-preview-04-17, gemini-2.0-flash, gemini-1.5-pro など</p>
+                        <h4>Requesty:</h4>
+                        <p>openai/gpt-4.1, anthropic/claude-3-5-sonnet-20241022, xai/grok-3-mini-beta など</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="save-settings" class="primary-btn">保存して閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/script.js"></script>
+</body>
+</html>
